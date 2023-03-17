@@ -1,0 +1,77 @@
+﻿@using BlazorServerAuthDemo.Pages.UserManagementComponents
+
+@page "/usermanagement"
+@attribute [Authorize]
+
+<div class="container-fluid">
+    <h2>User Management</h2>
+    <hr />
+    <div class="row">
+        <div class="col-3 bg-light-subtle">
+            <nav class="flex-column">
+                <div class="nav-item">
+                    <button class="nav-link btn btn-link" @onclick="() => SetPageType(PageType.Profile)">
+                        Profile
+                    </button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link btn btn-link" @onclick="() => SetPageType(PageType.Email)">
+                        Email
+                    </button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link btn btn-link" @onclick="() => SetPageType(PageType.Password)">
+                        Password
+                    </button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link btn btn-link" @onclick="() => SetPageType(PageType.TwoFactor)">
+                        Two-factor authentication
+                    </button>
+                </div>
+                <div class="nav-item">
+                    <button class="nav-link btn btn-link" @onclick="() => SetPageType(PageType.PersonalData)">
+                        Personal data
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div class="col-9">
+            @switch (_pageType)
+            {
+                case PageType.Profile:
+                    <Profile/>
+                    break;
+                case PageType.Email:
+                    <Email/>
+                    break;
+                case PageType.Password:
+                    <Password/>
+                    break;
+                case PageType.TwoFactor:
+                    <TwoFactor/>
+                    break;
+                case PageType.PersonalData:
+                    <PersonalData/>
+                    break;
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private PageType _pageType = PageType.Profile;
+
+    private void SetPageType(PageType pageType)
+    {
+        _pageType = pageType;
+    }
+    private enum PageType
+    {
+        Profile,
+        Email,
+        Password,
+        TwoFactor,
+        PersonalData
+    }
+}

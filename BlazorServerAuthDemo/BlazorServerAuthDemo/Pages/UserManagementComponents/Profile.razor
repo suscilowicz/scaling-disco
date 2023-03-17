@@ -1,0 +1,97 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<IdentityUser> UserManager
+@inject AppAuthenticationStateProvider AppAuthenticationStateProvider
+
+<h3>Profile</h3>
+
+<EditForm Model="_personalDataForm" OnValidSubmit=@Update OnInvalidSubmit=@ClearNotify>
+    <div class="row">
+        <div class="col-6">
+            <DataAnnotationsValidator />
+
+            <div class="form-group row">
+                <label class="col-form-label">
+                    Email:
+                </label>
+                <div class="col-sm-10">
+                    <InputText disabled=true @bind-Value="_personalDataForm.Email" class="form-control" id="Email"></InputText>
+                </div>
+
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label">
+                    Phone Number:
+                </label>
+                <div class="col-sm-10">
+                    <InputText @bind-Value="_personalDataForm.PhoneNumber" class="form-control" id="PhoneNumber"></InputText>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <button class="btn btn-primary" type="submit">Update</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <ValidationSummary />
+        </div>
+
+    </div>
+</EditForm>
+
+@if (_isUpdated.HasValue && _isUpdated.Value)
+{
+    <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+        <label class="p-2">Profile updated.</label>
+    </div>
+}
+
+@if (_isUpdated.HasValue && !_isUpdated.Value)
+{
+    <div class="row bg-danger text-dark" style="margin-top:10px; height:40px">
+        <label class="p-2">Something went wrong...</label>
+    </div>
+}
+
+@code {
+    private PersonalDataForm _personalDataForm;
+    private bool? _isUpdated;
+    private IdentityUser _user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _personalDataForm = new();
+        _user = AppAuthenticationStateProvider.CurrentUser;
+        _personalDataForm.Email = await UserManager.GetEmailAsync(_user);
+        _personalDataForm.PhoneNumber = await UserManager.GetPhoneNumberAsync(_user);
+    }
+
+    private async Task Update()
+    {
+        ClearNotify();
+        var phoneNumber = await UserManager.GetPhoneNumberAsync(_user);
+        if (_personalDataForm.PhoneNumber != phoneNumber)
+        {
+            var actionResult = await UserManager.SetPhoneNumberAsync(_user, _personalDataForm.PhoneNumber);
+            if (actionResult.Succeeded)
+            {
+                _isUpdated = true;
+                await AppAuthenticationStateProvider.SetAuthenticationState(_user);
+            }
+            
+        }
+    }
+
+    private void ClearNotify()
+    {
+        _isUpdated = null;
+    }
+
+    private class PersonalDataForm
+    {
+        [EmailAddress]
+        public string Email { get; set; }
+        [Phone]
+        public string PhoneNumber { get; set; }
+    }
+}

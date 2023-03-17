@@ -1,0 +1,23 @@
+﻿@using System.Security.Claims
+@inject AppAuthenticationStateProvider AppAuthenticationStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        <a href="usermanagement">Hello @AppAuthenticationStateProvider.CurrentUser.Email</a>
+        <button type="submit" class="nav-link btn btn-link" @onclick="TryLogout">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="register">Register</a>
+        <a href="login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code{
+    private async Task TryLogout()
+    {
+        await AppAuthenticationStateProvider.LogoutAsync();
+    }
+}
+
+
